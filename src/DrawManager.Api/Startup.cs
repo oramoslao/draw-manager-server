@@ -113,6 +113,8 @@ namespace DrawManager
             // Enable Cors
             app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
+            app.UseAuthentication();
+
             // Enable Mvc
             app.UseMvc();
 
