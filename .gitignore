@@ -331,5 +331,5 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
-*.sqlite
+/db/*.sqlite
 /src/DrawManager.ImportTool/Data/Import/data.txt
