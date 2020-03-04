@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DrawManager.Api.Entities;
+using DrawManager.Domain.Entities;
 
 namespace DrawManager.Api.Features.Prizes
 {

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using DrawManager.Api.Entities;
 using DrawManager.Api.Infrastructure;
+using DrawManager.Domain.Entities;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

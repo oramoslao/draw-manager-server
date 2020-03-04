@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace DrawManager.Domain.Entities
 {
     public class Draw : Entity<int>
     {
-        /// <summary>
-        /// Id del sorteo. Autogenerado.
-        /// </summary>
-        public int Id { get; set; }
         /// <summary>
         /// Nombre del sorteo.
         /// </summary>
@@ -42,25 +39,25 @@ namespace DrawManager.Domain.Entities
         /// <summary>
         /// Cantidad de participaciones del sorteo.
         /// </summary>
-        public int EntriesQty => Entries.Count;
+        public int EntriesQty => DrawEntries.Count;
         /// <summary>
         /// Bandera que indica cuando el sorteo se ha completado.
         /// </summary>
-        public bool IsCompleted => Prizes.Count > 0 && Prizes.TrueForAll(p => p.Delivered);
+        public bool IsCompleted => Prizes.Count > 0 && Prizes.ToList().TrueForAll(p => p.Delivered);
 
         /// <summary>
         /// Premios.
         /// </summary>
-        public List<Prize> Prizes { get; set; }
+        public ICollection<Prize> Prizes { get; set; }
         /// <summary>
         /// Participaciones.
         /// </summary>
-        public List<DrawEntry> Entries { get; set; }
+        public ICollection<DrawEntry> DrawEntries { get; set; }
 
-        public Draw()
-        {
-            Prizes = new List<Prize>();
-            Entries = new List<DrawEntry>();
-        }
+        //public Draw()
+        //{
+        //    Prizes = new List<Prize>();
+        //    DrawEntries = new List<DrawEntry>();
+        //}
     }
 }

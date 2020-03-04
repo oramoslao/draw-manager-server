@@ -6,9 +6,10 @@ namespace DrawManager.Domain
 {
     public class Constants
     {
-        public const string AppSettingsJsonFile = "appsettings.json";
-        public const string FormatEnvironmentFileAppSettings = "appsettings.{0}.json";
+        public const string APP_SETTINGS_JSON_FILE = "appsettings.json";
+        public const string FORMAT_ENVIRONMENT_APP_SETTINGS_FILE = "appsettings.{0}.json";
 
-        public const string ConnectionStringName = "DefaultConnection";
+        public const string CONNECTION_STRING_NAME_SQL_SERVER = "SqlDbConnection";
+        public const string SQL_SERVER_ENTITY_FRAMEWORK_ASSEMBLY_NAME = "DrawManager.Database.SqlServer";
     }
 }

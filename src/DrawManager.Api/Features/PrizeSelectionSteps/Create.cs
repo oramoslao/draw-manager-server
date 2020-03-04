@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
-using DrawManager.Api.Entities;
 using DrawManager.Api.Infrastructure;
+using DrawManager.Database.SqlServer;
+using DrawManager.Domain.Entities;
+using DrawManager.Domain.Enums;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -32,10 +34,11 @@ namespace DrawManager.Api.Features.PrizeSelectionSteps
         public class Handler : IRequestHandler<Command, PrizeSelectionStepEnvelope>
         {
             private readonly IMapper _mapper;
-            private readonly DrawManagerDbContext _context;
+            //private readonly DrawManagerDbContext _context;
+            private readonly DrawManagerSqlServerDbContext _context;
             private readonly IRandomSelector _randomSelector;
 
-            public Handler(IMapper mapper, DrawManagerDbContext context, IRandomSelector randomSelector)
+            public Handler(IMapper mapper, DrawManagerSqlServerDbContext context, IRandomSelector randomSelector)
             {
                 _mapper = mapper;
                 _context = context;
@@ -103,7 +106,7 @@ namespace DrawManager.Api.Features.PrizeSelectionSteps
                     .GetEntriesByDrawExcludingPreviousWinnersAndLosers(prize.DrawId);
 
                 // Excluding the losers steps for the current prize, the prize's winners from others draws that belongs to the same group and the removed entrant id
-                var entries = removedEntrantId ==- -1 
+                var entries = removedEntrantId == - -1
                     ? allEntries
                         .Where(de =>
                             previousLoserSteps.All(l => l.EntrantId != de.EntrantId)

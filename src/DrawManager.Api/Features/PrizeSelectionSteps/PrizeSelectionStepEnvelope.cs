@@ -1,4 +1,4 @@
-﻿using DrawManager.Api.Entities;
+﻿using DrawManager.Domain.Enums;
 using System;
 
 namespace DrawManager.Api.Features.PrizeSelectionSteps

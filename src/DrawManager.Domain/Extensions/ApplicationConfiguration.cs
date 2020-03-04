@@ -3,19 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DrawManager.Domain.Infrastructure
+namespace DrawManager.Domain.Extensions
 {
-    public static class AppSettings
+    public static class ApplicationConfiguration
     {
         public static IConfigurationRoot GetConfiguration(string path, string environmentName = null)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(path)
-                .AddJsonFile(Constants.AppSettingsJsonFile, optional: true, reloadOnChange: true);
+                .AddJsonFile(Constants.APP_SETTINGS_JSON_FILE, optional: true, reloadOnChange: true);
 
             if (!string.IsNullOrWhiteSpace(environmentName))
             {
-                var filePath = string.Format(Constants.FormatEnvironmentFileAppSettings, environmentName);
+                var filePath = string.Format(Constants.FORMAT_ENVIRONMENT_APP_SETTINGS_FILE, environmentName);
                 builder = builder.AddJsonFile(filePath, optional: true, reloadOnChange: true);
             }
 

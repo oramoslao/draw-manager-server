@@ -1,4 +1,5 @@
 ﻿using DrawManager.Api.Infrastructure;
+using DrawManager.Database.SqlServer;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -32,9 +33,9 @@ namespace DrawManager.Api.Features.Draws
 
         public class Handler : IRequestHandler<Command>
         {
-            private readonly DrawManagerDbContext _context;
+            private readonly DrawManagerSqlServerDbContext _context;
 
-            public Handler(DrawManagerDbContext context)
+            public Handler(DrawManagerSqlServerDbContext context)
             {
                 _context = context;
             }

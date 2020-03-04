@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using DrawManager.Api.Entities;
 using DrawManager.Api.Infrastructure;
+using DrawManager.Database.SqlServer;
+using DrawManager.Domain.Entities;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -36,11 +37,13 @@ namespace DrawManager.Api.Features.Users
         public class Handler : IRequestHandler<Command, UserEnvelope>
         {
             private readonly IMapper _mapper;
-            private readonly DrawManagerDbContext _context;
+            //private readonly DrawManagerDbContext _context;
+            private readonly DrawManagerSqlServerDbContext _context;
             private readonly IPasswordHasher _passwordHasher;
             private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
-            public Handler(IMapper mapper, DrawManagerDbContext context, IPasswordHasher passwordHasher, IJwtTokenGenerator jwtTokenGenerator)
+            //public Handler(IMapper mapper, DrawManagerDbContext context, IPasswordHasher passwordHasher, IJwtTokenGenerator jwtTokenGenerator)
+            public Handler(IMapper mapper, DrawManagerSqlServerDbContext context, IPasswordHasher passwordHasher, IJwtTokenGenerator jwtTokenGenerator)
             {
                 _mapper = mapper;
                 _context = context;

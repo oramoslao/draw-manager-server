@@ -4,8 +4,9 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using DrawManager.Api.Entities;
 using DrawManager.Api.Infrastructure;
+using DrawManager.Database.SqlServer;
+using DrawManager.Domain.Entities;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -36,11 +37,13 @@ namespace DrawManager.Api.Features.Users
         public class Handler : IRequestHandler<Command, UserEnvelope>
         {
             private readonly IMapper _mapper;
-            private readonly DrawManagerDbContext _context;
+            //private readonly DrawManagerDbContext _context;
+            private readonly DrawManagerSqlServerDbContext _context;
             private readonly IPasswordHasher _passwordHasher;
             private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
-            public Handler(IMapper mapper, DrawManagerDbContext context, IPasswordHasher passwordHasher, IJwtTokenGenerator jwtTokenGenerator)
+            //public Handler(IMapper mapper, DrawManagerDbContext context, IPasswordHasher passwordHasher, IJwtTokenGenerator jwtTokenGenerator)
+            public Handler(IMapper mapper, DrawManagerSqlServerDbContext context, IPasswordHasher passwordHasher, IJwtTokenGenerator jwtTokenGenerator)
             {
                 _mapper = mapper;
                 _context = context;
@@ -53,7 +56,7 @@ namespace DrawManager.Api.Features.Users
                 // Getting if user exist
                 var existUser = await _context
                     .Users
-                    .Where(u => u.Login.Equals(request.UserData.Login, StringComparison.InvariantCultureIgnoreCase))
+                    .Where(u => string.Equals(u.Login.ToLower(), request.UserData.Login.ToLower()))
                     .AnyAsync(cancellationToken);
 
                 // Validations

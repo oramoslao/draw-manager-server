@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using DrawManager.Api.Entities;
 using DrawManager.Api.Infrastructure;
+using DrawManager.Database.SqlServer;
+using DrawManager.Domain.Entities;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -37,9 +38,9 @@ namespace DrawManager.Api.Features.Prizes
         public class QueryHandler : IRequestHandler<Query, PrizesEnvelope>
         {
             private readonly IMapper _mapper;
-            private readonly DrawManagerDbContext _context;
+            private readonly DrawManagerSqlServerDbContext _context;
 
-            public QueryHandler(IMapper mapper, DrawManagerDbContext context)
+            public QueryHandler(IMapper mapper, DrawManagerSqlServerDbContext context)
             {
                 _mapper = mapper;
                 _context = context;
@@ -75,7 +76,7 @@ namespace DrawManager.Api.Features.Prizes
                 // Mapping
                 return new PrizesEnvelope
                 {
-                    Prizes = _mapper.Map<List<Prize>, List<PrizeEnvelope>>(draw.Prizes),
+                    Prizes = _mapper.Map<ICollection<Prize>, ICollection<PrizeEnvelope>>(draw.Prizes),
                     PrizesQty = draw.PrizesQty
                 };
             }

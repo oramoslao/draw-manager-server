@@ -30,22 +30,24 @@ namespace DrawManager.Domain.Entities
         public int DrawId { get; set; }
 
         /// <summary>
+        /// Sorteo.
+        /// </summary>
+        public Draw Draw { get; set; }
+
+        /// <summary>
         /// Bandera que indica si el premio ya fue entregado.
         /// </summary>
         public bool Delivered => SelectionSteps.Count == AttemptsUntilChooseWinner + 1 && SelectionSteps.Any(st => st.PrizeSelectionStepType == PrizeSelectionStepType.Winner);
 
-        /// <summary>
-        /// Sorteo.
-        /// </summary>
-        public Draw Draw { get; set; }
+        
         /// <summary>
         /// Pasos de selección.
         /// </summary>
-        public List<PrizeSelectionStep> SelectionSteps { get; set; }
+        public ICollection<PrizeSelectionStep> SelectionSteps { get; set; }
 
-        public Prize()
-        {
-            SelectionSteps = new List<PrizeSelectionStep>();
-        }
+        //public Prize()
+        //{
+        //    SelectionSteps = new List<PrizeSelectionStep>();
+        //}
     }
 }

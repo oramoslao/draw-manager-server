@@ -15,6 +15,6 @@ namespace DrawManager.Api.Features.Prizes
 
         public bool Delivered { get; set; }
 
-        public List<PrizeSelectionStepEnvelope> SelectionSteps { get; set; }
+        public ICollection<PrizeSelectionStepEnvelope> SelectionSteps { get; set; }
     }
 }

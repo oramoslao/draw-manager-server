@@ -10,26 +10,30 @@ namespace DrawManager.Domain.Entities
         /// Id del sorteo a la que pertenece la participación. Llave foránea.
         /// </summary>
         public int DrawId { get; set; }
-        /// <summary>
-        /// Id del participante a la que pertenece la participación. Llave foránea.
-        /// </summary>
-        public int EntrantId { get; set; }
-        /// <summary>
-        /// Fecha de registro de la participación.
-        /// </summary>
-        public DateTime RegisteredOn { get; set; }
 
         /// <summary>
         /// Sorteo.
         /// </summary>
         public Draw Draw { get; set; }
+
+        /// <summary>
+        /// Id del participante a la que pertenece la participación. Llave foránea.
+        /// </summary>
+        public int EntrantId { get; set; }
+
         /// <summary>
         /// Participante.
         /// </summary>
         public Entrant Entrant { get; set; }
+
+        /// <summary>
+        /// Fecha de registro de la participación.
+        /// </summary>
+        public DateTime RegisteredOn { get; set; }
+        
         /// <summary>
         /// Pasos de selección.
         /// </summary>
-        public List<PrizeSelectionStep> SelectionSteps { get; set; }
+        public ICollection<PrizeSelectionStep> SelectionSteps { get; set; }
     }
 }

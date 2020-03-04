@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DrawManager.Api;
-using DrawManager.Api.Infrastructure;
+using DrawManager.Database.SqlServer;
+using DrawManager.Domain.Extensions;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -10,18 +11,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 using System;
+using System.IO;
+using DomainConstants = DrawManager.Domain.Constants;
+using Infrastructure = DrawManager.Api.Infrastructure;
 
 namespace DrawManager
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IWebHostEnvironment env)
         {
-            Configuration = configuration;
+            Configuration = ApplicationConfiguration.GetConfiguration(Directory.GetCurrentDirectory(), env.EnvironmentName);
         }
 
         public IConfiguration Configuration { get; }
@@ -31,59 +35,59 @@ namespace DrawManager
         {
             // Registering MediatR options
             services.AddMediatR();
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(Infrastructure.ValidationPipelineBehavior<,>));
 
             // Registering database context
             var dbConnString = Environment.GetEnvironmentVariable(DrawManagerApiWellKnownConstants.DB_CONNECTIONSTRING_KEY)
                 ?? Configuration.GetConnectionString(DrawManagerApiWellKnownConstants.DB_CONNECTIONSTRING_KEY);
-            services
-                .AddDbContext<DrawManagerDbContext>(options => options.UseSqlite(dbConnString));
+
+            //services
+            //    .AddDbContext<DrawManagerDbContext>(options => options.UseSqlite(dbConnString));
+
+            var connectionString = Configuration.GetConnectionString(DomainConstants.CONNECTION_STRING_NAME_SQL_SERVER);
+            services.AddDbContext<DrawManagerSqlServerDbContext>(options => options.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(DomainConstants.SQL_SERVER_ENTITY_FRAMEWORK_ASSEMBLY_NAME)));
 
             // Registering swagger options
             var swaggerVersion = Configuration[DrawManagerApiWellKnownConstants.SWAGGER_VERSION_KEY];
             var swaggerTitle = Configuration[DrawManagerApiWellKnownConstants.SWAGGER_TITLE_KEY];
             var swaggerDescription = Configuration[DrawManagerApiWellKnownConstants.SWAGGER_DESCRIPTION_KEY];
-            var swaggerTermsOfService = Configuration[DrawManagerApiWellKnownConstants.SWAGGER_TERMSOFSERVICE_KEY];
-            services
-                .AddSwaggerGen(x =>
+
+            services.AddSwaggerGen(x =>
                 {
-                    x.SwaggerDoc(swaggerVersion, new Info
+                    x.SwaggerDoc(swaggerVersion, new OpenApiInfo
                     {
                         Title = swaggerTitle,
                         Version = swaggerVersion,
-                        Description = swaggerDescription,
-                        TermsOfService = swaggerTermsOfService
+                        Description = swaggerDescription
                     });
-                    x.CustomSchemaIds(y => y.FullName);
-                    x.DocInclusionPredicate((version, apiDescription) => true);
-                    x.TagActionsBy(y => y.GroupName);
                 });
 
             // Registering Cors
             services.AddCors();
 
             // Registering Mvc options
-            services
-                .AddMvc(options =>
+            services.AddMvc(options =>
                 {
-                    options.Conventions.Add(new GroupByApiRootConvention());
-                    options.Filters.Add(typeof(ValidatorActionFilter));
+                    options.Conventions.Add(new Infrastructure.GroupByApiRootConvention());
+                    options.Filters.Add(typeof(Infrastructure.ValidatorActionFilter));
+                    options.EnableEndpointRouting = false;
                 })
-                .AddJsonOptions(options =>
-                {
-                    options.SerializerSettings.DefaultValueHandling = DefaultValueHandling.Include;
-                })
+                //.AddJsonOptions(options =>
+                //{
+                //    options.JsonSerializerOptions.
+                //    options.SerializerSettings.DefaultValueHandling = DefaultValueHandling.Include;
+                //})
                 .AddFluentValidation(cfg => { cfg.RegisterValidatorsFromAssemblyContaining<Startup>(); })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             // Registering AutoMapper
             services.AddAutoMapper(GetType().Assembly);
 
             // Registering services
-            services.AddScoped<IRandomSelector, RandomSelector>();
-            services.AddScoped<IPasswordHasher, PasswordHasher>();
-            services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
-            services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
+            services.AddScoped<Infrastructure.IRandomSelector, Infrastructure.RandomSelector>();
+            services.AddScoped<Infrastructure.IPasswordHasher, Infrastructure.PasswordHasher>();
+            services.AddScoped<Infrastructure.IJwtTokenGenerator, Infrastructure.JwtTokenGenerator>();
+            services.AddScoped<Infrastructure.ICurrentUserAccessor, Infrastructure.CurrentUserAccessor>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // Registering Jwt
@@ -91,12 +95,12 @@ namespace DrawManager
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             // Enable database creation ensuring and migrations
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                serviceScope.ServiceProvider.GetService<DrawManagerDbContext>().Database.Migrate();
+                serviceScope.ServiceProvider.GetService<DrawManagerSqlServerDbContext>().Database.Migrate();
             }
 
             if (env.IsDevelopment())
@@ -108,7 +112,7 @@ namespace DrawManager
             loggerFactory.AddSerilogLogging();
 
             // Enable error's middleware
-            app.UseMiddleware<ErrorHandlingMiddleware>();
+            app.UseMiddleware<Infrastructure.ErrorHandlingMiddleware>();
 
             // Enable Cors
             app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
@@ -125,6 +129,12 @@ namespace DrawManager
             app.UseSwaggerUI(options =>
             {
                 options.SwaggerEndpoint(Configuration[DrawManagerApiWellKnownConstants.SWAGGER_ENDPOINT_KEY], Configuration[DrawManagerApiWellKnownConstants.SWAGGER_NAME_KEY]);
+            });
+
+            app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
             });
         }
     }

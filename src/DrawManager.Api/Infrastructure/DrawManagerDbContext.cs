@@ -1,4 +1,4 @@
-﻿using DrawManager.Api.Entities;
+﻿using DrawManager.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -61,12 +61,12 @@ namespace DrawManager.Api.Infrastructure
 
                 drawEntry
                     .HasOne(de => de.Entrant)
-                    .WithMany(e => e.Entries)
+                    .WithMany(e => e.DrawEntries)
                     .HasForeignKey(de => de.EntrantId);
 
                 drawEntry
                     .HasOne(de => de.Draw)
-                    .WithMany(d => d.Entries)
+                    .WithMany(d => d.DrawEntries)
                     .HasForeignKey(de => de.DrawId);
             });
 

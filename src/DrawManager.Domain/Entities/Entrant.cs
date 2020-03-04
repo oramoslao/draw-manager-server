@@ -50,16 +50,16 @@ namespace DrawManager.Domain.Entities
         /// <summary>
         /// Participaciones.
         /// </summary>
-        public List<DrawEntry> Entries { get; set; }
+        public ICollection<DrawEntry> DrawEntries { get; set; }
         /// <summary>
         /// Pasos de selección.
         /// </summary>
-        public List<PrizeSelectionStep> SelectionSteps { get; set; }
+        public ICollection<PrizeSelectionStep> SelectionSteps { get; set; }
 
-        public Entrant()
-        {
-            Entries = new List<DrawEntry>();
-            SelectionSteps = new List<PrizeSelectionStep>();
-        }
+        //public Entrant()
+        //{
+        //    DrawEntries = new List<DrawEntry>();
+        //    SelectionSteps = new List<PrizeSelectionStep>();
+        //}
     }
 }
