@@ -16,6 +16,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
 using System.IO;
+using System.Reflection;
 using DomainConstants = DrawManager.Domain.Constants;
 using Infrastructure = DrawManager.Api.Infrastructure;
 
@@ -34,7 +35,7 @@ namespace DrawManager
         public void ConfigureServices(IServiceCollection services)
         {
             // Registering MediatR options
-            services.AddMediatR();
+            services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(Infrastructure.ValidationPipelineBehavior<,>));
 
             // Registering database context

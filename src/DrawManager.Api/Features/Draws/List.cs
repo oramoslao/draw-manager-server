@@ -14,13 +14,13 @@ namespace DrawManager.Api.Features.Draws
     {
         public class Query : IRequest<DrawsEnvelope>
         {
-            public int? Limit { get; private set; }
-            public int? Offset { get; private set; }
+            public int Limit { get; set; }
+            public int Offset { get; set; }
 
             public Query(int? limit, int? offset)
             {
-                Limit = limit;
-                Offset = offset;
+                Limit = limit ?? 10;
+                Offset = offset ?? 0;
             }
         }
 
@@ -41,8 +41,8 @@ namespace DrawManager.Api.Features.Draws
                 var draws = await _context
                     .Draws
                     .Include(d => d.Prizes)
-                    .Skip(request.Offset ?? 0)
-                    .Take(request.Limit ?? 10)
+                    .Skip(request.Offset)
+                    .Take(request.Limit)
                     .AsNoTracking()
                     .ToListAsync(cancellationToken);
 
