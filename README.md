@@ -16,3 +16,14 @@ A generic draw manager.
 docker network create --subnet=172.24.0.0/16 mynet
 2. Ejecutar el comando para asiganar el contenedor a la subred creada y asignarle una Ip estatica.
 docker run -e "ASPNETCORE_ENVIRONMENT=Release" --restart unless-stopped --name "clientDrawProd" --network mynet --ip 172.17.16.22 -d -p 7000:80 draw_manager_api:runtime
+
+#Commandos de Entity Framework
+
+###Agregar nueva migración
+dotnet ef migrations add InitialDB -s ../DrawManager.Api -c DrawManagerSqlServerDbContext
+
+###Eliminar migraciones
+dotnet ef migrations remove -s ../DrawManager.Api -c DrawManagerSqlServerDbContext
+
+###Actualizar base de dato
+dotnet ef database update -s ../DrawManager.Api -c DrawManagerSqlServerDbContext
