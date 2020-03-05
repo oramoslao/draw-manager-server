@@ -39,8 +39,8 @@ namespace DrawManager
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(Infrastructure.ValidationPipelineBehavior<,>));
 
             // Registering database context
-            var dbConnString = Environment.GetEnvironmentVariable(DrawManagerApiWellKnownConstants.DB_CONNECTIONSTRING_KEY)
-                ?? Configuration.GetConnectionString(DrawManagerApiWellKnownConstants.DB_CONNECTIONSTRING_KEY);
+            //var dbConnString = Environment.GetEnvironmentVariable(DrawManagerApiWellKnownConstants.DB_CONNECTIONSTRING_KEY)
+            //    ?? Configuration.GetConnectionString(DrawManagerApiWellKnownConstants.DB_CONNECTIONSTRING_KEY);
 
             //services
             //    .AddDbContext<DrawManagerDbContext>(options => options.UseSqlite(dbConnString));
@@ -48,38 +48,8 @@ namespace DrawManager
             var connectionString = Configuration.GetConnectionString(DomainConstants.CONNECTION_STRING_NAME_SQL_SERVER);
             services.AddDbContext<DrawManagerSqlServerDbContext>(options => options.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(DomainConstants.SQL_SERVER_ENTITY_FRAMEWORK_ASSEMBLY_NAME)));
 
-            // Registering swagger options
-            var swaggerVersion = Configuration[DrawManagerApiWellKnownConstants.SWAGGER_VERSION_KEY];
-            var swaggerTitle = Configuration[DrawManagerApiWellKnownConstants.SWAGGER_TITLE_KEY];
-            var swaggerDescription = Configuration[DrawManagerApiWellKnownConstants.SWAGGER_DESCRIPTION_KEY];
-
-            services.AddSwaggerGen(x =>
-                {
-                    x.SwaggerDoc(swaggerVersion, new OpenApiInfo
-                    {
-                        Title = swaggerTitle,
-                        Version = swaggerVersion,
-                        Description = swaggerDescription
-                    });
-                });
-
             // Registering Cors
             services.AddCors();
-
-            // Registering Mvc options
-            services.AddMvc(options =>
-                {
-                    options.Conventions.Add(new Infrastructure.GroupByApiRootConvention());
-                    options.Filters.Add(typeof(Infrastructure.ValidatorActionFilter));
-                    options.EnableEndpointRouting = false;
-                })
-                //.AddJsonOptions(options =>
-                //{
-                //    options.JsonSerializerOptions.
-                //    options.SerializerSettings.DefaultValueHandling = DefaultValueHandling.Include;
-                //})
-                .AddFluentValidation(cfg => { cfg.RegisterValidatorsFromAssemblyContaining<Startup>(); })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             // Registering AutoMapper
             services.AddAutoMapper(GetType().Assembly);
@@ -93,6 +63,22 @@ namespace DrawManager
 
             // Registering Jwt
             services.AddJwt();
+
+            // Registering Mvc options
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(typeof(Infrastructure.ValidatorActionFilter));
+                options.EnableEndpointRouting = false;
+            }).AddFluentValidation(cfg =>
+            {
+                cfg.RegisterValidatorsFromAssemblyContaining<Startup>();
+            });
+
+            //// Registering swagger options
+            var swaggerVersion = Configuration[DrawManagerApiWellKnownConstants.SWAGGER_VERSION_KEY];
+            var swaggerTitle = Configuration[DrawManagerApiWellKnownConstants.SWAGGER_TITLE_KEY];
+
+            services.AddSwagger(swaggerVersion, swaggerTitle);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -116,7 +102,12 @@ namespace DrawManager
             app.UseMiddleware<Infrastructure.ErrorHandlingMiddleware>();
 
             // Enable Cors
-            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+            app.UseCors(builder =>
+            {
+                builder.AllowAnyOrigin();
+                builder.AllowAnyHeader();
+                builder.AllowAnyMethod();
+            });
 
             app.UseAuthentication();
 
@@ -127,16 +118,13 @@ namespace DrawManager
             app.UseSwagger();
 
             // Enable middleware to serve swagger-ui assets(HTML, JS, CSS etc.)
+            var swaggerUrl = Configuration[DrawManagerApiWellKnownConstants.SWAGGER_ENDPOINT_KEY];
+            var swaggerName = Configuration[DrawManagerApiWellKnownConstants.SWAGGER_NAME_KEY];
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint(Configuration[DrawManagerApiWellKnownConstants.SWAGGER_ENDPOINT_KEY], Configuration[DrawManagerApiWellKnownConstants.SWAGGER_NAME_KEY]);
+                options.SwaggerEndpoint(swaggerUrl, swaggerName);
             });
 
-            app.UseRouting();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
         }
     }
 }

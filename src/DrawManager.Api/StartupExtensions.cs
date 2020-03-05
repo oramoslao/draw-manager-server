@@ -1,11 +1,17 @@
 ﻿using DrawManager.Api.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +19,23 @@ namespace DrawManager.Api
 {
     public static class StartupExtensions
     {
+        public static void AddSwagger(this IServiceCollection services, string swaggerVersion, string swaggerTitle)
+        {
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc(swaggerVersion, new OpenApiInfo
+                {
+                    Title = swaggerTitle,
+                    Version = swaggerVersion
+                });
+
+                c.CustomSchemaIds(x => x.FullName);
+            });
+
+            services.AddSwaggerGenNewtonsoftSupport();
+
+        }
         public static void AddJwt(this IServiceCollection services)
         {
             services.AddOptions();
@@ -80,5 +103,7 @@ namespace DrawManager.Api
             loggerFactory.AddSerilog(logger);
             Log.Logger = logger;
         }
+
+
     }
 }

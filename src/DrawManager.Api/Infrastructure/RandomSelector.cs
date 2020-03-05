@@ -18,7 +18,7 @@ namespace DrawManager.Api.Infrastructure
         /// If there are fewer than n elements in items, this may return fewer than k elements.
         /// </summary>
         /// <typeparam name="TElem">Type of element in the items collection.</typeparam>
-        /// <param name="items">Items to be randomly selected.</param>
+        /// <param name="source">Items to be randomly selected.</param>
         /// <param name="k">Number of items to pick.</param>
         /// <param name="n">Total number of items to choose from.
         /// If the items collection contains more than this number, the extra members will be skipped.

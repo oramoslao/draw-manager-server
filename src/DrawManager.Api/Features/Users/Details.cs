@@ -55,7 +55,7 @@ namespace DrawManager.Api.Features.Users
                 var user = await _context
                     .Users
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(u => u.Login.Equals(message.Login, StringComparison.InvariantCultureIgnoreCase), cancellationToken);
+                    .FirstOrDefaultAsync(u => string.Equals(u.Login.ToLower(), message.Login.ToLower()), cancellationToken);
 
                 // Validations
                 if (user == null)

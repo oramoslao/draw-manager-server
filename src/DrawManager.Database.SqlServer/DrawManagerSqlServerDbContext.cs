@@ -55,8 +55,6 @@ namespace DrawManager.Database.SqlServer
 
             });
 
-
-
             modelBuilder.Entity<Draw>(entity =>
             {
                 entity

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DrawManager.Api.Infrastructure;
+using DrawManager.Database.SqlServer;
 using DrawManager.Domain.Entities;
 using FluentValidation;
 using MediatR;
@@ -36,9 +37,9 @@ namespace DrawManager.Api.Features.Draws
         public class Handler : IRequestHandler<Command, DrawEnvelope>
         {
             private readonly IMapper _mappper;
-            private readonly DrawManagerDbContext _context;
+            private readonly DrawManagerSqlServerDbContext _context;
 
-            public Handler(IMapper mapper, DrawManagerDbContext context)
+            public Handler(IMapper mapper, DrawManagerSqlServerDbContext context)
             {
                 _mappper = mapper;
                 _context = context;
